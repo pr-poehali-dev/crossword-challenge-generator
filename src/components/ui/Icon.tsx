@@ -15,6 +15,11 @@ const Icon = ({ name, fallback = "CircleAlert", ...props }: IconProps) => {
   React.useEffect(() => {
     const importIcon = async () => {
       try {
+        // Проверяем, существует ли такое имя иконки в списке доступных
+        if (!(name in dynamicIconImports)) {
+          throw new Error(`Icon name "${name}" not found in dynamicIconImports`);
+        }
+        
         const { default: LucideIcon } = await import(`lucide-react/dist/esm/icons/${name}`);
         setIcon(() => LucideIcon);
         setError(false);
@@ -22,6 +27,7 @@ const Icon = ({ name, fallback = "CircleAlert", ...props }: IconProps) => {
         console.error(`Failed to load icon: ${name}`, err);
         setError(true);
         
+        // Пробуем загрузить fallback иконку
         if (fallback && fallback !== name) {
           try {
             const { default: FallbackIcon } = await import(`lucide-react/dist/esm/icons/${fallback}`);
